@@ -91,24 +91,30 @@
       this.positionX + (isNaN(this.positionX)? '' : 'px') + ' ' +
       this.positionY + (isNaN(this.positionY)? '' : 'px');
 
+    var mobileFixCss = {
+      backgroundImage: 'url(' + this.imageSrc + ')',
+      backgroundPosition: this.position
+    };
+    if (options.repeatBackgroundImage) {
+      $.extend(mobileFixCss, {
+        backgroundRepeat: 'repeat',
+      });
+    } else {
+      $.extend(mobileFixCss, {
+        backgroundSize: 'cover',
+      });
+    }
+
     if (navigator.userAgent.match(/(iPod|iPhone|iPad)/)) {
       if (this.imageSrc && this.iosFix && !this.$element.is('img')) {
-        this.$element.css({
-          backgroundImage: 'url(' + this.imageSrc + ')',
-          backgroundSize: 'cover',
-          backgroundPosition: this.position
-        });
+        this.$element.css(mobileFixCss);
       }
       return this;
     }
 
     if (navigator.userAgent.match(/(Android)/)) {
       if (this.imageSrc && this.androidFix && !this.$element.is('img')) {
-        this.$element.css({
-          backgroundImage: 'url(' + this.imageSrc + ')',
-          backgroundSize: 'cover',
-          backgroundPosition: this.position
-        });
+        this.$element.css(mobileFixCss);
       }
       return this;
     }
@@ -118,9 +124,13 @@
     var slider = this.$element.find('>.parallax-slider');
     var sliderExisted = false;
 
-    if (slider.length == 0)
-      this.$slider = $('<img />').prependTo(this.$mirror);
-    else {
+    if (slider.length == 0) {
+      if (options.repeatBackgroundImage){
+        this.$slider = $('<div />').prependTo(this.$mirror);
+      } else {
+        this.$slider = $('<img />').prependTo(this.$mirror);
+      }
+    } else {
       this.$slider = slider.prependTo(this.$mirror)
       sliderExisted = true;
     }
@@ -134,10 +144,10 @@
       overflow: 'hidden'
     });
 
-    this.$slider.addClass('parallax-slider').one('load', function() {
+    var setupParallax = function(fallbackHeight, fallbackWidth) {
       if (!self.naturalHeight || !self.naturalWidth) {
-        self.naturalHeight = this.naturalHeight || this.height || 1;
-        self.naturalWidth  = this.naturalWidth  || this.width  || 1;
+        self.naturalHeight = this.naturalHeight || fallbackHeight;
+        self.naturalWidth = this.naturalWidth || fallbackWidth;
       }
       self.aspectRatio = self.naturalWidth / self.naturalHeight;
 
@@ -145,10 +155,23 @@
       Parallax.sliders.push(self);
       Parallax.isFresh = false;
       Parallax.requestRender();
-    });
+    };
 
-    if (!sliderExisted)
-      this.$slider[0].src = this.imageSrc;
+    if (options.repeatBackgroundImage) {
+      setupParallax(this.$element.height(), this.$element.width());
+    } else {
+      this.$slider.addClass('parallax-slider').one('load', function() {
+        setupParallax(this.height || 1, this.width || 1);
+      });
+    }
+
+    if (!sliderExisted) {
+      if (options.repeatBackgroundImage) {
+        this.$slider.css('background-image', 'url(' + this.imageSrc + ')')
+      } else {
+        this.$slider[0].src = this.imageSrc;
+      }
+    }
 
     if (this.naturalHeight && this.naturalWidth || this.$slider[0].complete || slider.length > 0) {
       this.$slider.trigger('load');

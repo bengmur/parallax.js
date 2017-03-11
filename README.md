@@ -110,6 +110,12 @@ Note that when specifying these options as html data-attributes, you should conv
 			<td>You must provide a path to the image you wish to apply to the parallax effect.</td>
 		</tr>
 		<tr>
+			<td>repeatBackgroundImage</td>
+			<td>boolean</td>
+			<td>null</td>
+			<td>When set to true, this will use the provided image as a repeating background image for the parallax effect, as opposed to just setting an image element and resizing it to the provided or calculated width/height.</td>
+		</tr>
+		<tr>
 			<td>naturalWidth</td>
 			<td>number</td>
 			<td>auto</td>
