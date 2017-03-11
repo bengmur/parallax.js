@@ -125,11 +125,8 @@
     var sliderExisted = false;
 
     if (slider.length == 0) {
-      if (options.repeatBackgroundImage){
-        this.$slider = $('<div />').prependTo(this.$mirror);
-      } else {
-        this.$slider = $('<img />').prependTo(this.$mirror);
-      }
+      var tag = options.repeatBackgroundImage ? '<div />' : '<img />';
+      this.$slider = $(tag).prependTo(this.$mirror);
     } else {
       this.$slider = slider.prependTo(this.$mirror)
       sliderExisted = true;
